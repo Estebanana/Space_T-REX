@@ -64,7 +64,7 @@
 
 struct textures_s{
     SDL_Texture* background; /*!< Texture liée à l'image du fond de l'écran. */
-    /* A COMPLETER */
+    SDL_Texture* vaisseau; /*!< Texture liée à l'image du vaisseau. */
 };
 
 
@@ -74,16 +74,28 @@ struct textures_s{
 
 typedef struct textures_s textures_t;
 
+/**
+ * \brief Représentation du sprite du jeu
+*/
+
+struct sprite_s{
+    int h; /*!< Hauteur du sprite. */
+    int w; /*!< Largeur du sprite. */
+    int posx; /*!< Position x du centre du sprite. */
+    int posy; /*!< Position y du centre du sprite. */
+};
+
+/**
+ * \brief Type qui correspond au sprite
+ */
+typedef struct sprite_s sprite_t;
 
 /**
  * \brief Représentation du monde du jeu
 */
 
 struct world_s{
-    /*
-      A COMPLETER
-     */
-    
+    sprite_t spaceship; /*!< Champ du sprite pour le vaisseau. */
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
 
 };
@@ -94,9 +106,21 @@ struct world_s{
 
 typedef struct world_s world_t;
 
+/**
+ * \brief La fonction initialise les données du sprite
+ * \param sprite A COMPLETER
+ */
 
+void init_sprite(sprite_t * sprite, int x,int y,int w,int h){
+    sprite->posx = x;
+    sprite->posy = y;
+    sprite->h = h;
+    sprite->w = w;
+}
 
-
+void print_sprite(sprite_t *sprite){
+    printf("Sprite : coords |%d|%d| Hauteur|%d| Largeur|%d|", sprite->posx, sprite->posy, sprite->h, sprite->w);
+}
 
 /**
  * \brief La fonction initialise les données du monde du jeu
@@ -105,12 +129,12 @@ typedef struct world_s world_t;
 
 
 void init_data(world_t * world){
-    
     //on n'est pas à la fin du jeu
     world->gameover = 0;
-    
+    sprite_t * ship = malloc(sizeof(sprite_t));
+    init_sprite(ship, SCREEN_WIDTH/2, SCREEN_HEIGHT - SHIP_SIZE, SHIP_SIZE,SHIP_SIZE);
+    print_sprite(ship);
 }
-
 
 /**
  * \brief La fonction nettoie les données du monde
@@ -182,8 +206,8 @@ void handle_events(SDL_Event *event,world_t *world){
 
 void clean_textures(textures_t *textures){
     clean_texture(textures->background);
-    /* A COMPLETER */
-}
+    clean_texture(textures->vaisseau)
+;}
 
 
 
@@ -194,8 +218,9 @@ void clean_textures(textures_t *textures){
 */
 
 void  init_textures(SDL_Renderer *renderer, textures_t *textures){
-    textures->background = load_image( "ressources/background.bmp",renderer);
-    
+    textures->background = load_image( "ressources/space-background.bmp",renderer);
+    textures->vaisseau = load_image( "ressources/spaceship.bmp",renderer);
+
     /* A COMPLETER */
 
     
