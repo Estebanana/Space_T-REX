@@ -264,7 +264,7 @@ void init(SDL_Window **window, SDL_Renderer ** renderer, textures_t *textures, w
  *  \brief programme principal qui implémente la boucle du jeu
  */
 
-
+// commentaire
 int main( int argc, char* args[] )
 {
     SDL_Event event;
@@ -297,4 +297,3 @@ int main( int argc, char* args[] )
     
     return 0;
 }
-//on est là
