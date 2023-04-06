@@ -95,7 +95,7 @@ typedef struct sprite_s sprite_t;
 */
 
 struct world_s{
-    sprite_t spaceship; /*!< Champ du sprite pour le vaisseau. */
+    sprite_t * spaceship; /*!< Champ du sprite pour le vaisseau. */
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
 
 };
@@ -119,7 +119,7 @@ void init_sprite(sprite_t * sprite, int x,int y,int w,int h){
 }
 
 void print_sprite(sprite_t *sprite){
-    printf("Sprite : coords |%d|%d| Hauteur|%d| Largeur|%d|", sprite->posx, sprite->posy, sprite->h, sprite->w);
+    printf("Sprite : coords |%d|%d| Hauteur|%d| Largeur|%d|\n", sprite->posx, sprite->posy, sprite->h, sprite->w);
 }
 
 /**
@@ -131,9 +131,9 @@ void print_sprite(sprite_t *sprite){
 void init_data(world_t * world){
     //on n'est pas à la fin du jeu
     world->gameover = 0;
-    sprite_t * ship = malloc(sizeof(sprite_t));
-    init_sprite(ship, SCREEN_WIDTH/2, SCREEN_HEIGHT - SHIP_SIZE, SHIP_SIZE,SHIP_SIZE);
-    print_sprite(ship);
+    world->spaceship = malloc(sizeof(sprite_t));
+    init_sprite(world->spaceship, (SCREEN_WIDTH - SHIP_SIZE)/2, SCREEN_HEIGHT - SHIP_SIZE, SHIP_SIZE,SHIP_SIZE);
+    print_sprite(world->spaceship);
 }
 
 /**
@@ -188,13 +188,24 @@ void handle_events(SDL_Event *event,world_t *world){
             world->gameover = 1;
         }
        
-         //si une touche est appuyée
-         if(event->type == SDL_KEYDOWN){
-             //si la touche appuyée est 'D'
-             if(event->key.keysym.sym == SDLK_d){
-                 printf("La touche D est appuyée\n");
-              }
-         }
+        //si une touche est appuyée
+        if(event->type == SDL_KEYDOWN){
+            //si la touche appuyée est 'D'
+            if(event->key.keysym.sym == SDLK_RIGHT){
+                world->spaceship->posx += 1;
+                print_sprite(world->spaceship);
+
+            }
+        }
+
+        //si une touche est appuyée
+        if(event->type == SDL_KEYDOWN){
+            //si la touche appuyée est 'Q'
+            if(event->key.keysym.sym == SDLK_LEFT){
+                world->spaceship->posx -= 1;
+                print_sprite(world->spaceship);
+            }
+        }
     }
 }
 
@@ -239,7 +250,11 @@ void apply_background(SDL_Renderer *renderer, SDL_Texture *texture){
     }
 }
 
-
+void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t* sprite){
+    if(texture != NULL){
+        apply_texture(texture, renderer, sprite->posx,sprite->posy);
+    }
+}
 
 
 
@@ -257,7 +272,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *texture
     
     //application des textures dans le renderer
     apply_background(renderer, textures->background);
-    /* A COMPLETER */
+    apply_sprite(renderer,textures->vaisseau,world->spaceship);
     
     // on met à jour l'écran
     update_screen(renderer);
