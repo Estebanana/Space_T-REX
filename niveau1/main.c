@@ -114,7 +114,7 @@ typedef struct world_s world_t;
  */
 
 void init_sprite(sprite_t * sprite, int x,int y,int w,int h){
-    sprite->posx = x;
+    sprite-fin>posx = x;
     sprite->posy = y;
     sprite->h = h;
     sprite->w = w;
@@ -172,7 +172,7 @@ int is_game_over(world_t *world){
  */
 
 void update_data(world_t *world){
-    
+    world->finishline->posy += world->vy;
 }
 
 
@@ -198,7 +198,6 @@ void handle_events(SDL_Event *event,world_t *world){
             //si la touche appuyée est 'D'
             if(event->key.keysym.sym == SDLK_RIGHT){
                 world->spaceship->posx += 1;
-                print_sprite(world->spaceship);
 
             }
         }
@@ -208,7 +207,6 @@ void handle_events(SDL_Event *event,world_t *world){
             //si la touche appuyée est 'Q'
             if(event->key.keysym.sym == SDLK_LEFT){
                 world->spaceship->posx -= 1;
-                print_sprite(world->spaceship);
             }
         }
     }
