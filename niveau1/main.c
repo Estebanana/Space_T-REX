@@ -114,7 +114,7 @@ typedef struct world_s world_t;
  */
 
 void init_sprite(sprite_t * sprite, int x,int y,int w,int h){
-    sprite-fin>posx = x;
+    sprite->posx = x;
     sprite->posy = y;
     sprite->h = h;
     sprite->w = w;
