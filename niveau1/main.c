@@ -1,7 +1,7 @@
 /**
  * \file main.c
  * \brief Programme principal initial du niveau 1
- * \author Mathieu Constant
+ * \author Esteban ROMERA--ROMARY & Pierre
  * \version 1.0
  * \date 18 mars 2021
  */
@@ -214,7 +214,7 @@ void handle_events(SDL_Event *event,world_t *world){
         if(event->type == SDL_KEYDOWN){
             //si la touche appuyée est 'D'
             if(event->key.keysym.sym == SDLK_RIGHT){
-                world->spaceship->posx += 1;
+                world->spaceship->posx += MOVING_STEP;
 
             }
         }
@@ -223,7 +223,7 @@ void handle_events(SDL_Event *event,world_t *world){
         if(event->type == SDL_KEYDOWN){
             //si la touche appuyée est 'Q'
             if(event->key.keysym.sym == SDLK_LEFT){
-                world->spaceship->posx -= 1;
+                world->spaceship->posx -= MOVING_STEP;
             }
         }
     }
@@ -276,7 +276,21 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t* sprite
     }
 }
 
-
+/**
+ * \brief La fonction rafraichit l'écran en fonction de l'état des données du monde
+ * \param renderer le renderer lié à l'écran de jeu
+ * \param world les données du monde
+ * \param textures les textures
+ */
+void apply_wall(SDL_Renderer *renderer, SDL_Texture *textures, sprite_t* sprite){
+    for(int i =0; i<=7; i++){
+        for(int j =0; j<=3; i++){
+            if(textures != NULL){
+                apply_sprite(renderer, textures, sprite);
+            }
+        }
+    }
+}
 
 /**
  * \brief La fonction rafraichit l'écran en fonction de l'état des données du monde
@@ -294,7 +308,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *texture
     apply_background(renderer, textures->background);
     apply_sprite(renderer,textures->spaceship,world->spaceship);
     apply_sprite(renderer,textures->finishline,world->finishline);
-    apply_sprite(renderer,textures->meteorite, world->meteorite);
+    apply_wall(renderer,textures->meteorite, world->meteorite);
     // on met à jour l'écran
     update_screen(renderer);
 }
