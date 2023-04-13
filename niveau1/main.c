@@ -101,7 +101,7 @@ struct world_s{
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
     sprite_t * finishline; /*!< Champ du sprite pour la ligne d'arrivée. */
     int vy; /*!< Correspond à la vitesse de déplacement vertical de la ligne d'arrivée. */
-    sprite_t * meteorite; /*!< Champ du sprite pour la méteorite. */
+    sprite_t * mur; /*!< Champ du sprite pour le mur. */
 };
 
 /**
@@ -127,19 +127,6 @@ void print_sprite(sprite_t *sprite){
 }
 
 /**
- * \brief La fonction initialise un mur de méteorites.
- * \param world les données du monde
- */
-
-void mur_meteor(world_t* world){
-    world->meteorite = malloc(sizeof(sprite_t));
-    for(int y=0; y<=228; y+=32){
-        init_sprite(world->meteorite, (SCREEN_WIDTH/2)-(METEORITE_SIZE*1.5), y, METEORITE_SIZE, METEORITE_SIZE);
-        init_sprite(world->meteorite, (SCREEN_WIDTH/2)-METEORITE_SIZE/2, y, METEORITE_SIZE, METEORITE_SIZE);
-        init_sprite(world->meteorite, (SCREEN_WIDTH/2)+METEORITE_SIZE/2, y, METEORITE_SIZE, METEORITE_SIZE);
-    }
-}
-/**
  * \brief La fonction initialise les données du monde du jeu
  * \param world les données du monde
  */
@@ -154,7 +141,9 @@ void init_data(world_t * world){
     world->finishline = malloc(sizeof(sprite_t));
     init_sprite(world->finishline, 0, FINISH_LINE_HEIGHT,SCREEN_WIDTH,FINISH_LINE_HEIGHT);
     world->vy = INITIAL_SPEED;
-    mur_meteor(world);
+    world->mur = malloc(sizeof(sprite_t));
+    init_sprite(world->mur, (SCREEN_WIDTH/2)-(METEORITE_SIZE*1.5), METEORITE_SIZE, 3*METEORITE_SIZE, 7*METEORITE_SIZE);
+    print_sprite(world->mur);
 }
 
 /**
@@ -189,7 +178,7 @@ int is_game_over(world_t *world){
 
 void update_data(world_t *world){
     world->finishline->posy += world->vy;
-    world->meteorite->posy += world->vy;
+    world->mur->posy += world->vy;
 }
 
 
@@ -270,11 +259,17 @@ void apply_background(SDL_Renderer *renderer, SDL_Texture *texture){
     }
 }
 
+/**
+ * \brief La fonction applique la texture du sprite sur le renderer lié à l'écran de jeu
+ * \param renderer le renderer
+ * \param texture la texture liée au fond
+*/
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t* sprite){
     if(texture != NULL){
         apply_texture(texture, renderer, sprite->posx,sprite->posy);
     }
 }
+
 
 /**
  * \brief La fonction rafraichit l'écran en fonction de l'état des données du monde
@@ -283,13 +278,16 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t* sprite
  * \param textures les textures
  */
 void apply_wall(SDL_Renderer *renderer, SDL_Texture *textures, sprite_t* sprite){
-    for(int i =0; i<=7; i++){
-        for(int j =0; j<=3; i++){
+  int x = sprite->posx;
+   int y = sprite->posy;
+   for(int i =0; i<7; i++){
+        for(int j =0; j<3; j++){
             if(textures != NULL){
-                apply_sprite(renderer, textures, sprite);
+	       apply_texture(textures, renderer, x+j*METEORITE_SIZE, y+i*METEORITE_SIZE);
             }
         }
     }
+
 }
 
 /**
@@ -308,7 +306,9 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *texture
     apply_background(renderer, textures->background);
     apply_sprite(renderer,textures->spaceship,world->spaceship);
     apply_sprite(renderer,textures->finishline,world->finishline);
-    apply_wall(renderer,textures->meteorite, world->meteorite);
+    //printf("j'appelle apply_wall \n");
+    
+    apply_wall(renderer,textures->meteorite, world->mur);
     // on met à jour l'écran
     update_screen(renderer);
 }
