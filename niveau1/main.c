@@ -207,6 +207,25 @@ void handle_events(SDL_Event *event,world_t *world){
 
             }
         }
+        
+        //si une touche est appuyée
+        if(event->type == SDL_KEYDOWN){
+            //si la touche appuyée est 'D'
+            if(event->key.keysym.sym == SDLK_UP){
+                world->vy += INITIAL_SPEED;
+
+            }
+        }
+        
+        //si une touche est appuyée
+        if(event->type == SDL_KEYUP){
+            //si la touche appuyée est 'D'
+            if(event->key.keysym.sym == SDLK_UP){
+                world->vy -= INITIAL_SPEED;
+
+            }
+        }
+
 
         //si une touche est appuyée
         if(event->type == SDL_KEYDOWN){
