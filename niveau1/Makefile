@@ -1,8 +1,8 @@
-CFLAGS = -O3 `sdl2-config --cflags`
+CFLAGS = -g -O3 `sdl2-config --cflags`
 LDFLAGS = `sdl2-config --libs` -lSDL2_ttf -lm
 
-INC = sdl2-light.h
-SRC = main.c sdl2-light.c
+INC = sdl2-light.h constante.h module_logique.h module_graphique.h
+SRC = main.c sdl2-light.c module_logique.c module_graphique.c
 OBJ = $(SRC:%.c=%.o)
 
 PROG = spacecorridor
