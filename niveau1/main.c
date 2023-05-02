@@ -1,9 +1,9 @@
 /**
  * \file main.c
- * \brief Programme principal initial du niveau 1
+ * \brief Programme niveau 2
  * \author Esteban ROMERA--ROMARY & Pierre
  * \version 1.0
- * \date 18 mars 2021
+ * \date 18 avril 2023
  */
 
 #include "sdl2-light.h"
@@ -19,49 +19,36 @@
  */
 #define SCREEN_HEIGHT 480
 
-
 /**
  * \brief Taille d'un vaisseau
  */
-
 #define SHIP_SIZE 32
-
 
 /**
  * \brief Taille d'un météorite
 */
-
 #define METEORITE_SIZE 32
-
 
 /**
  * \brief Hauteur de la ligne d'arrivée
  */
-
-
 #define FINISH_LINE_HEIGHT 10
-
 
 /**
  * \brief Pas de déplacement horizontal du vaisseau
 */
-
 #define MOVING_STEP 10
-
 
 /**
   * \brief Vitesse initiale de déplacement vertical des éléments du jeu 
 */
-
 #define INITIAL_SPEED 2
-
 
 
 
 /**
  * \brief Représentation pour stocker les textures nécessaires à l'affichage graphique
 */
-
 struct textures_s{
     SDL_Texture* background; /*!< Texture liée à l'image du fond de l'écran. */
     SDL_Texture* spaceship; /*!< Texture liée à l'image du vaisseau. */
@@ -69,17 +56,15 @@ struct textures_s{
     SDL_Texture* meteorite; /*!< Texture liée à l'image de la météorite. */
 };
 
-
 /**
  * \brief Type qui correspond aux textures du jeu
 */
-
 typedef struct textures_s textures_t;
+
 
 /**
  * \brief Représentation du sprite du jeu
 */
-
 struct sprite_s{
     int h; /*!< Hauteur du sprite. */
     int w; /*!< Largeur du sprite. */
@@ -92,10 +77,10 @@ struct sprite_s{
  */
 typedef struct sprite_s sprite_t;
 
+
 /**
  * \brief Représentation du monde du jeu
 */
-
 struct world_s{
     sprite_t * spaceship; /*!< Champ du sprite pour le vaisseau. */
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
@@ -107,14 +92,13 @@ struct world_s{
 /**
  * \brief Type qui correspond aux données du monde
  */
-
 typedef struct world_s world_t;
+
 
 /**
  * \brief La fonction initialise les données du sprite
  * \param sprite A COMPLETER
  */
-
 void init_sprite(sprite_t * sprite, int x,int y,int w,int h){
     sprite->posx = x;
     sprite->posy = y;
@@ -191,47 +175,68 @@ void update_data(world_t *world){
 
 void handle_events(SDL_Event *event,world_t *world){
     Uint8 *keystates;
-    while( SDL_PollEvent( event ) ) {
+    while(SDL_PollEvent(event)){
         
         //Si l'utilisateur a cliqué sur le X de la fenêtre
         if( event->type == SDL_QUIT ) {
             //On indique la fin du jeu
             world->gameover = 1;
         }
+
+        //si une touche est appuyée
+        if(event->type == SDL_KEYDOWN){
+            //si la touche appuyée est 'ESC'
+            if(event->key.keysym.sym == SDLK_ESCAPE){
+                world->gameover = 1;
+            }
+        }
+
+        //si une touche est appuyée
+        if(event->type == SDL_KEYDOWN){
+            //si la touche appuyée est 'flèche droite'
+            if(event->key.keysym.sym == SDLK_RIGHT){
+                world->spaceship->posx += MOVING_STEP;
+            }
+        }
+
+        //si une touche est appuyée
+        if(event->type == SDL_KEYDOWN){
+            //si la touche appuyée est 'flèche gauche'
+            if(event->key.keysym.sym == SDLK_LEFT){
+                world->spaceship->posx -= MOVING_STEP;
+            }
+        }
+
        
         //si une touche est appuyée
         if(event->type == SDL_KEYDOWN){
-            //si la touche appuyée est 'D'
-            if(event->key.keysym.sym == SDLK_RIGHT){
-                world->spaceship->posx += MOVING_STEP;
-
-            }
-        }
-        
-        //si une touche est appuyée
-        if(event->type == SDL_KEYDOWN){
-            //si la touche appuyée est 'D'
+            //si la touche appuyée est 'flèche haut'
             if(event->key.keysym.sym == SDLK_UP){
                 world->vy += INITIAL_SPEED;
-
             }
         }
         
-        //si une touche est appuyée
+        //si une touche est relachée
         if(event->type == SDL_KEYUP){
-            //si la touche appuyée est 'D'
+            //si la touche relachée est 'flèche haut'
             if(event->key.keysym.sym == SDLK_UP){
                 world->vy -= INITIAL_SPEED;
-
             }
         }
 
-
         //si une touche est appuyée
         if(event->type == SDL_KEYDOWN){
-            //si la touche appuyée est 'Q'
-            if(event->key.keysym.sym == SDLK_LEFT){
-                world->spaceship->posx -= MOVING_STEP;
+            //si la touche appuyée est 'flèche bas'
+            if(event->key.keysym.sym == SDLK_DOWN){
+                world->vy -= INITIAL_SPEED;
+            }
+        }
+        
+        //si une touche est relachée
+        if(event->type == SDL_KEYUP){
+            //si la touche relachée est 'flèche bas'
+            if(event->key.keysym.sym == SDLK_DOWN){
+                world->vy += INITIAL_SPEED;
             }
         }
     }
