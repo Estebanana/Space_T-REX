@@ -8,8 +8,8 @@
 
 #include "sdl2-light.h"
 #include "constante.h"
-#include "module_graphique.h"
-#include "module_logique.h"
+#include "graphique.h"
+#include "logique.h"
 
 /**
 * \brief fonction qui nettoie le jeu: nettoyage de la partie graphique (SDL), nettoyage des textures, nettoyage des données
