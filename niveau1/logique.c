@@ -53,10 +53,27 @@ void init_data(world_t * world){
 
 void clean_data(world_t *world){
     /* utile uniquement si vous avez fait de l'allocation dynamique (malloc); la fonction ici doit permettre de libérer la mémoire (free) */
-    
+    free(world->spaceship);
+    free(world->finishline);
+    free(world->mur);
 }
 
+/**
+ * \brief La fonction indique si le jeu est fini en fonction des données du monde
+ * \param world les données du monde
+ */
 
+void border_cross(world_t *world){
+    //limite à droite
+    if (world->spaceship->posx + world->spaceship->w/2 > SCREEN_WIDTH){
+        world->spaceship->posx = 0;
+    }
+    //limite à gauche
+    if (world->spaceship->posx + world->spaceship->w/2 < 0){
+        world->spaceship->posx = SCREEN_WIDTH - world->spaceship->w/2;
+    }
+    //print_sprite(world->spaceship);
+}
 
 /**
  * \brief La fonction indique si le jeu est fini en fonction des données du monde
@@ -78,6 +95,7 @@ int is_game_over(world_t *world){
 void update_data(world_t *world){
     world->finishline->posy += world->vy;
     world->mur->posy += world->vy;
+    border_cross(world);
 }
 
 
