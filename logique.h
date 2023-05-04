@@ -4,10 +4,8 @@
  * \brief Fichier d'en tete pour le module logique.
 */
 
-#ifndef MODULE_LOGIQUE_H
-#define MODULE_LOGIQUE_H
-#include "module_graphique.h"
-#include "module_logique.h"
+#ifndef LOGIQUE_H
+#define LOGIQUE_H
 #include "constante.h"
 #include "sdl2-light.h"
 
@@ -15,7 +13,7 @@
 /**
  * \brief Représentation du sprite du jeu
 */
-struct sprite_s{
+struct sprite_s {
     int h; /*!< Hauteur du sprite. */
     int w; /*!< Largeur du sprite. */
     int posx; /*!< Position x du centre du sprite. */
@@ -37,6 +35,7 @@ struct world_s{
     sprite_t * finishline; /*!< Champ du sprite pour la ligne d'arrivée. */
     int vy; /*!< Correspond à la vitesse de déplacement vertical de la ligne d'arrivée. */
     sprite_t * mur; /*!< Champ du sprite pour le mur. */
+    int make_disappear; /*!< Champ visibilité du sprite. */
 };
 
 /**
@@ -83,5 +82,11 @@ void update_data(world_t *world);
  * \param world les données du monde
  */
 void handle_events(SDL_Event *event,world_t *world);
+
+void border_cross(world_t *world);
+
+int sprites_collide(sprite_t *sp1, sprite_t *sp2);
+
+void handle_sprites_collision(world_t* world, sprite_t *sp1, sprite_t *sp2);
 
 #endif

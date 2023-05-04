@@ -4,8 +4,8 @@
  * \brief Pour définir les fonctions graphique.
 */
 
-#include "module_graphique.h"
-#include "module_logique.h"
+#include "graphique.h"
+#include "logique.h"
 #include "constante.h"
 #include "sdl2-light.h"
 
@@ -95,10 +95,10 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *texture
     
     //application des textures dans le renderer
     apply_background(renderer, textures->background);
-    apply_sprite(renderer,textures->spaceship,world->spaceship);
+    if(world->make_disappear == 0){ //s'il n'y a pas de collision avec le mur
+        apply_sprite(renderer,textures->spaceship,world->spaceship);
+    }
     apply_sprite(renderer,textures->finishline,world->finishline);
-    //printf("j'appelle apply_wall \n");
-    
     apply_wall(renderer,textures->meteorite, world->mur);
     // on met à jour l'écran
     update_screen(renderer);
