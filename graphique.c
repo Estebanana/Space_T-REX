@@ -71,8 +71,8 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t* sprite
 void apply_wall(SDL_Renderer *renderer, SDL_Texture *textures, sprite_t* sprite){
   int x = sprite->posx;
    int y = sprite->posy;
-   for(int i =0; i<7; i++){
-        for(int j =0; j<3; j++){
+   for(int i =0; i< (sprite->h/METEORITE_SIZE) ; i++){
+        for(int j =0; j< (sprite->w/METEORITE_SIZE); j++){
             if(textures != NULL){
 	       apply_texture(textures, renderer, x+j*METEORITE_SIZE, y+i*METEORITE_SIZE);
             }
@@ -99,7 +99,10 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *texture
         apply_sprite(renderer,textures->spaceship,world->spaceship);
     }
     apply_sprite(renderer,textures->finishline,world->finishline);
-    apply_wall(renderer,textures->meteorite, world->mur);
+    for(int i = 0; i<6; i++){
+        apply_wall(renderer,textures->meteorite, world->listemur[i]);
+    }
+    
     // on met à jour l'écran
     update_screen(renderer);
 }

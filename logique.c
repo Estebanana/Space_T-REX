@@ -21,6 +21,46 @@ void init_sprite(sprite_t * sprite, int x,int y,int w,int h){
     sprite->w = w;
 }
 
+void init_walls(sprite_t **listemur){
+    for(int i=0; i<6; i++){
+        listemur[i] = malloc(sizeof(sprite_t));
+        listemur[i]->posx = 0;
+        listemur[i]->posy = 0;
+        listemur[i]->h = 0;
+        listemur[i]->w = 0;
+    }
+
+    listemur[0]->posx = 48;
+    listemur[0]->posy = 0;
+    listemur[0]->h = 6*METEORITE_SIZE;
+    listemur[0]->w = 3*METEORITE_SIZE;
+
+    listemur[1]->posx = 252;
+    listemur[1]->posy = 0;
+    listemur[1]->h = 6*METEORITE_SIZE;
+    listemur[1]->w = 3*METEORITE_SIZE;
+
+    listemur[2]->posx = 16;
+    listemur[2]->posy = -352;
+    listemur[2]->h = 5*METEORITE_SIZE;
+    listemur[2]->w = METEORITE_SIZE;
+
+    listemur[3]->posx = 188;
+    listemur[3]->posy = -352;
+    listemur[3]->h = 5*METEORITE_SIZE;
+    listemur[3]->w = 7*METEORITE_SIZE;
+
+    listemur[4]->posx = 48;
+    listemur[4]->posy = -672;
+    listemur[4]->h = 6*METEORITE_SIZE;
+    listemur[4]->w = 3*METEORITE_SIZE;
+
+    listemur[5]->posx = 252;
+    listemur[5]->posy = -672;
+    listemur[5]->h = 6*METEORITE_SIZE;
+    listemur[5]->w = 3*METEORITE_SIZE;
+}
+
 void print_sprite(sprite_t *sprite){
     printf("Sprite : coords |%d|%d| Hauteur|%d| Largeur|%d|\n", sprite->posx, sprite->posy, sprite->h, sprite->w);
 }
@@ -29,8 +69,6 @@ void print_sprite(sprite_t *sprite){
  * \brief La fonction initialise les données du monde du jeu
  * \param world les données du monde
  */
-
-
 void init_data(world_t * world){
     //on n'est pas à la fin du jeu
     world->gameover = 0;
@@ -40,10 +78,20 @@ void init_data(world_t * world){
     world->finishline = malloc(sizeof(sprite_t));
     init_sprite(world->finishline, 0, FINISH_LINE_HEIGHT,SCREEN_WIDTH,FINISH_LINE_HEIGHT);
     world->vy = INITIAL_SPEED;
-    world->mur = malloc(sizeof(sprite_t));
-    init_sprite(world->mur, (SCREEN_WIDTH/2)-(METEORITE_SIZE*1.5), METEORITE_SIZE, 3*METEORITE_SIZE, 7*METEORITE_SIZE);
-    //print_sprite(world->mur);
     world->make_disappear = 0;
+    sprite_t **listemur = malloc(sizeof(sprite_t*) * 6);
+    init_walls(listemur);
+}
+
+
+void clean_data(world_t *world){
+    /* utile uniquement si vous avez fait de l'allocation dynamique (malloc); la fonction ici doit permettre de libérer la mémoire (free) */
+    free(world->spaceship);
+    free(world->finishline);
+    for (int i = 0; i < 6; i++) {
+        free(world->listemur[i]);
+    }
+    free(world->listemur);
 }
 
 /**
@@ -56,7 +104,10 @@ void clean_data(world_t *world){
     /* utile uniquement si vous avez fait de l'allocation dynamique (malloc); la fonction ici doit permettre de libérer la mémoire (free) */
     free(world->spaceship);
     free(world->finishline);
-    free(world->mur);
+    for (int i = 0; i < 6; i++) {
+        free(world->listemur[i]);
+    }
+    free(world->listemur);
 }
 
 /**
@@ -92,8 +143,7 @@ int sprites_collide(sprite_t *sp1, sprite_t *sp2){
 void handle_sprites_collision(world_t* world, sprite_t *sp1, sprite_t *sp2){
     if(sprites_collide(sp1, sp2)){
         world->vy = 0;
-        print_sprite(world->mur);
-        //world->make_disappear =1;
+        world->make_disappear =1;
     }
 }
 
@@ -116,9 +166,13 @@ int is_game_over(world_t *world){
 
 void update_data(world_t *world){
     world->finishline->posy += world->vy;
-    world->mur->posy += world->vy;
+    for(int i = 0; i<6; i++){
+        world->listemur[i]->posy += world->vy;
+    }
     border_cross(world);
-    handle_sprites_collision(world, world->spaceship, world->mur);
+    for(int i = 0; i<6; i++){
+        handle_sprites_collision(world, world->spaceship, world->listemur[i]);
+    }
 }
 
 
