@@ -83,19 +83,17 @@ void border_cross(world_t *world){
  * \return 1 si collision ou 0 sinon
  */
 int sprites_collide(sprite_t *sp1, sprite_t *sp2){
-    if(abs(sp1->posx - sp2->posx) <= (sp1->w + sp2->w) && abs(sp1->posy - sp2->posy) <= (sp1->h + sp2->h)){
-        print_sprite(sp1);
-        print_sprite(sp2);
+    if(abs((sp1->posx + sp1->w/2) - (sp2->posx + sp2->w/2)) <= (sp1->w + sp2->w)/2 && abs((sp1->posy + sp1->h/2) - (sp2->posy + sp2->h/2)) <= (sp1->h + sp2->h)/2){
         return 1;
     }
-    
     return 0;
 }
 
 void handle_sprites_collision(world_t* world, sprite_t *sp1, sprite_t *sp2){
     if(sprites_collide(sp1, sp2)){
         world->vy = 0;
-        world->make_disappear =1;
+        print_sprite(world->mur);
+        //world->make_disappear =1;
     }
 }
 
