@@ -1,5 +1,5 @@
 /**
- * \file module_graphique.h
+ * \file graphique.h
  * \author Esteban ROMERA
  * \brief Fichier d'en tete pour le module graphique.
 */

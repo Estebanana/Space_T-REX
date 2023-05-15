@@ -1,5 +1,5 @@
 /**
- * \file module_logique.c
+ * \file logique.c
  * \author Esteban ROMERA
  * \brief Pour implémenter les fonctions du monde.
 */
@@ -21,6 +21,38 @@ void init_sprite(sprite_t * sprite, int x,int y,int w,int h){
     sprite->w = w;
 }
 
+void init_walls(sprite_t *listemur[]){
+    listemur[0]->posx = 48;
+    listemur[0]->posy = 0;
+    listemur[0]->h = 6*METEORITE_SIZE;
+    listemur[0]->w = 3*METEORITE_SIZE;
+
+    listemur[1]->posx = 252;
+    listemur[1]->posy = 0;
+    listemur[1]->h = 6*METEORITE_SIZE;
+    listemur[1]->w = 3*METEORITE_SIZE;
+
+    listemur[2]->posx = 16;
+    listemur[2]->posy = -352;
+    listemur[2]->h = 5*METEORITE_SIZE;
+    listemur[2]->w = METEORITE_SIZE;
+
+    listemur[3]->posx = 188;
+    listemur[3]->posy = -352;
+    listemur[3]->h = 5*METEORITE_SIZE;
+    listemur[3]->w = 7*METEORITE_SIZE;
+
+    listemur[4]->posx = 48;
+    listemur[4]->posy = -672;
+    listemur[4]->h = 6*METEORITE_SIZE;
+    listemur[4]->w = 3*METEORITE_SIZE;
+
+    listemur[5]->posx = 252;
+    listemur[5]->posy = -672;
+    listemur[5]->h = 6*METEORITE_SIZE;
+    listemur[5]->w = 3*METEORITE_SIZE;
+}
+
 void print_sprite(sprite_t *sprite){
     printf("Sprite : coords |%d|%d| Hauteur|%d| Largeur|%d|\n", sprite->posx, sprite->posy, sprite->h, sprite->w);
 }
@@ -29,34 +61,38 @@ void print_sprite(sprite_t *sprite){
  * \brief La fonction initialise les données du monde du jeu
  * \param world les données du monde
  */
-
-
-void init_data(world_t * world){
-    //on n'est pas à la fin du jeu
+void init_data(world_t *world) {
+    // on n'est pas à la fin du jeu
     world->gameover = 0;
+
     world->spaceship = malloc(sizeof(sprite_t));
-    init_sprite(world->spaceship, (SCREEN_WIDTH - SHIP_SIZE)/2, SCREEN_HEIGHT - SHIP_SIZE, SHIP_SIZE,SHIP_SIZE);
-    print_sprite(world->spaceship);
+    init_sprite(world->spaceship, (SCREEN_WIDTH - SHIP_SIZE) / 2, SCREEN_HEIGHT - SHIP_SIZE, SHIP_SIZE, SHIP_SIZE);
+
     world->finishline = malloc(sizeof(sprite_t));
-    init_sprite(world->finishline, 0, FINISH_LINE_HEIGHT,SCREEN_WIDTH,FINISH_LINE_HEIGHT);
+    init_sprite(world->finishline, 0, FINISH_LINE_HEIGHT, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
+
     world->vy = INITIAL_SPEED;
-    world->mur = malloc(sizeof(sprite_t));
-    init_sprite(world->mur, (SCREEN_WIDTH/2)-(METEORITE_SIZE*1.5), METEORITE_SIZE, 3*METEORITE_SIZE, 7*METEORITE_SIZE);
-    //print_sprite(world->mur);
     world->make_disappear = 0;
+
+    // Initialisation des murs de météorites
+    for (int i = 0; i < 6; i++) {
+        world->listemur[i] = malloc(sizeof(sprite_t));
+    }
+
+    init_walls(world->listemur);
 }
 
 /**
  * \brief La fonction nettoie les données du monde
  * \param world les données du monde
  */
-
-
 void clean_data(world_t *world){
     /* utile uniquement si vous avez fait de l'allocation dynamique (malloc); la fonction ici doit permettre de libérer la mémoire (free) */
     free(world->spaceship);
     free(world->finishline);
-    free(world->mur);
+    for (int i = 0; i < 6; i++) {
+        free(world->listemur[i]);
+    }
 }
 
 /**
@@ -83,12 +119,9 @@ void border_cross(world_t *world){
  * \return 1 si collision ou 0 sinon
  */
 int sprites_collide(sprite_t *sp1, sprite_t *sp2){
-    if(abs(sp1->posx - sp2->posx) <= (sp1->w + sp2->w) && abs(sp1->posy - sp2->posy) <= (sp1->h + sp2->h)){
-        print_sprite(sp1);
-        print_sprite(sp2);
+    if(abs((sp1->posx + sp1->w/2) - (sp2->posx + sp2->w/2)) <= (sp1->w + sp2->w)/2 && abs((sp1->posy + sp1->h/2) - (sp2->posy + sp2->h/2)) <= (sp1->h + sp2->h)/2){
         return 1;
     }
-    
     return 0;
 }
 
@@ -116,11 +149,19 @@ int is_game_over(world_t *world){
  * \param les données du monde
  */
 
-void update_data(world_t *world){
+
+void update_data(world_t *world) {
     world->finishline->posy += world->vy;
-    world->mur->posy += world->vy;
+
+    for (int i = 0; i < 6; i++) {
+        world->listemur[i]->posy += world->vy;
+    }
+
     border_cross(world);
-    handle_sprites_collision(world, world->spaceship, world->mur);
+
+    for (int i = 0; i < 6; i++) {
+        handle_sprites_collision(world, world->spaceship, world->listemur[i]);
+    }
 }
 
 
