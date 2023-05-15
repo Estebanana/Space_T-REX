@@ -32,6 +32,7 @@ typedef struct sprite_s sprite_t;
 struct world_s{
     //sprite_t * mur; /*!< Champ du sprite pour le murs. */
     sprite_t * spaceship; /*!< Champ du sprite pour le vaisseau. */
+    int quit; /*!< Champ indiquant si l'on quitte le jeu */
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
     sprite_t * finishline; /*!< Champ du sprite pour la ligne d'arrivée. */
     int vy; /*!< Correspond à la vitesse de déplacement vertical de la ligne d'arrivée. */

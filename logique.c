@@ -63,7 +63,7 @@ void print_sprite(sprite_t *sprite){
  */
 void init_data(world_t *world) {
     // on n'est pas à la fin du jeu
-    world->gameover = 0;
+    world->quit = 0;
 
     world->spaceship = malloc(sizeof(sprite_t));
     init_sprite(world->spaceship, (SCREEN_WIDTH - SHIP_SIZE) / 2, SCREEN_HEIGHT - SHIP_SIZE, SHIP_SIZE, SHIP_SIZE);
@@ -129,6 +129,7 @@ void handle_sprites_collision(world_t* world, sprite_t *sp1, sprite_t *sp2){
     if(sprites_collide(sp1, sp2)){
         world->vy = 0;
         world->make_disappear =1;
+        world->gameover = 1;
     }
 }
 
@@ -139,7 +140,7 @@ void handle_sprites_collision(world_t* world, sprite_t *sp1, sprite_t *sp2){
  */
 
 int is_game_over(world_t *world){
-    return world->gameover;
+    return world->quit;
 }
 
 /**
@@ -148,13 +149,20 @@ int is_game_over(world_t *world){
  * \return 
  */
 
-void end_game(world_t *world){
-    if(world->vy<0){
-        printf("you lost\n");
+void end_game(world_t *world) {
+    static int game_over_message = 0; // Variable statique pour suivre l'affichage du message
+    
+    if (!game_over_message && world->gameover == 1) {
+        printf("You lost!\n");
+        game_over_message = 1; // Marquer le message comme déjà affiché
     }
-    if(world->finishline->posy > world->spaceship->posy){
-        printf("You finished\n");
-        world->vy = 0;
+    
+    if (!game_over_message && sprites_collide(world->spaceship, world->finishline)) {
+        Uint32 current_time = SDL_GetTicks();
+        float elapsed_seconds = current_time / 1000.0f;
+        
+        printf("You finished in %.2f s!\n", elapsed_seconds);
+        game_over_message = 1; // Marquer le message comme déjà affiché
     }
 }
 
@@ -173,8 +181,6 @@ void update_walls(world_t *world) {
  * \brief La fonction met à jour les données en tenant compte de la physique du monde
  * \param les données du monde
  */
-
-
 void update_data(world_t *world) {
     world->finishline->posy += world->vy;
     
@@ -201,14 +207,14 @@ void handle_events(SDL_Event *event,world_t *world){
         //Si l'utilisateur a cliqué sur le X de la fenêtre
         if( event->type == SDL_QUIT ) {
             //On indique la fin du jeu
-            world->gameover = 1;
+            world->quit = 1;
         }
 
         //si une touche est appuyée
         if(event->type == SDL_KEYDOWN){
             //si la touche appuyée est 'ESC'
             if(event->key.keysym.sym == SDLK_ESCAPE){
-                world->gameover = 1;
+                world->quit = 1;
             }
         }
 

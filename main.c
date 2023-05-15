@@ -7,6 +7,7 @@
 */
 
 #include "sdl2-light.h"
+#include "sdl2-ttf-light.h"
 #include "constante.h"
 #include "graphique.h"
 #include "logique.h"
@@ -18,7 +19,6 @@
 * \param textures les textures
 * \param world le monde
 */
-
 void clean(SDL_Window *window, SDL_Renderer * renderer, textures_t *textures, world_t * world){
     clean_data(world);
     clean_textures(textures);
@@ -32,17 +32,16 @@ void clean(SDL_Window *window, SDL_Renderer * renderer, textures_t *textures, wo
  * \param textures les textures
  * \param world le monde
 */
-
 void init(SDL_Window **window, SDL_Renderer ** renderer, textures_t *textures, world_t * world){
     init_sdl(window,renderer,SCREEN_WIDTH, SCREEN_HEIGHT);
     init_data(world);
+    init_ttf();
     init_textures(*renderer,textures);
 }
 
 /**
  *  \brief programme principal qui implémente la boucle du jeu
 */
-
 int main( int argc, char* args[] )
 {
     SDL_Event event;
