@@ -22,32 +22,32 @@ void init_sprite(sprite_t * sprite, int x,int y,int w,int h){
 }
 
 void init_walls(sprite_t *listemur[]){
-    listemur[0]->posx = 48;
+    listemur[0]->posx = 32;
     listemur[0]->posy = 0;
     listemur[0]->h = 6*METEORITE_SIZE;
     listemur[0]->w = 3*METEORITE_SIZE;
 
-    listemur[1]->posx = 252;
+    listemur[1]->posx = 236;
     listemur[1]->posy = 0;
     listemur[1]->h = 6*METEORITE_SIZE;
     listemur[1]->w = 3*METEORITE_SIZE;
 
-    listemur[2]->posx = 16;
+    listemur[2]->posx = 0;
     listemur[2]->posy = -352;
     listemur[2]->h = 5*METEORITE_SIZE;
     listemur[2]->w = METEORITE_SIZE;
 
-    listemur[3]->posx = 188;
+    listemur[3]->posx = 172;
     listemur[3]->posy = -352;
     listemur[3]->h = 5*METEORITE_SIZE;
     listemur[3]->w = 7*METEORITE_SIZE;
 
-    listemur[4]->posx = 48;
+    listemur[4]->posx = 32;
     listemur[4]->posy = -672;
     listemur[4]->h = 6*METEORITE_SIZE;
     listemur[4]->w = 3*METEORITE_SIZE;
 
-    listemur[5]->posx = 252;
+    listemur[5]->posx = 236;
     listemur[5]->posy = -672;
     listemur[5]->h = 6*METEORITE_SIZE;
     listemur[5]->w = 3*METEORITE_SIZE;
@@ -69,7 +69,7 @@ void init_data(world_t *world) {
     init_sprite(world->spaceship, (SCREEN_WIDTH - SHIP_SIZE) / 2, SCREEN_HEIGHT - SHIP_SIZE, SHIP_SIZE, SHIP_SIZE);
 
     world->finishline = malloc(sizeof(sprite_t));
-    init_sprite(world->finishline, 0, FINISH_LINE_HEIGHT, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
+    init_sprite(world->finishline, 0, -960, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
 
     world->vy = INITIAL_SPEED;
     world->make_disappear = 0;
@@ -142,6 +142,31 @@ int is_game_over(world_t *world){
     return world->gameover;
 }
 
+/**
+ * \brief 
+ * \param world les données du monde
+ * \return 
+ */
+
+void end_game(world_t *world){
+    if(world->vy<0){
+        printf("you lost\n");
+    }
+    if(world->finishline->posy > world->spaceship->posy){
+        printf("You finished\n");
+        world->vy = 0;
+    }
+}
+
+/**
+ * \brief La fonction met à jour les données des murs
+ * \param world données du monde
+ */
+void update_walls(world_t *world) {
+    for (int i = 0; i < 6; i++) {
+        world->listemur[i]->posy += world->vy;
+    }
+}
 
 
 /**
@@ -152,16 +177,13 @@ int is_game_over(world_t *world){
 
 void update_data(world_t *world) {
     world->finishline->posy += world->vy;
-
-    for (int i = 0; i < 6; i++) {
-        world->listemur[i]->posy += world->vy;
-    }
-
+    
     border_cross(world);
-
+    update_walls(world);
     for (int i = 0; i < 6; i++) {
         handle_sprites_collision(world, world->spaceship, world->listemur[i]);
     }
+    end_game(world);
 }
 
 
