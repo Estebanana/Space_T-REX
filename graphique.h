@@ -58,7 +58,7 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t* sprite
  * \param world les données du monde
  * \param textures les textures
  */
-void apply_wall(SDL_Renderer *renderer, SDL_Texture *textures, sprite_t* sprite);
+void apply_walls(SDL_Renderer *renderer, SDL_Texture *textures, sprite_t* sprite);
 
 /**
  * \brief La fonction rafraichit l'écran en fonction de l'état des données du monde
