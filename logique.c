@@ -1,5 +1,5 @@
 /**
- * \file module_logique.c
+ * \file logique.c
  * \author Esteban ROMERA
  * \brief Pour implémenter les fonctions du monde.
 */
@@ -21,15 +21,7 @@ void init_sprite(sprite_t * sprite, int x,int y,int w,int h){
     sprite->w = w;
 }
 
-void init_walls(sprite_t **listemur){
-    for(int i=0; i<6; i++){
-        listemur[i] = malloc(sizeof(sprite_t));
-        listemur[i]->posx = 0;
-        listemur[i]->posy = 0;
-        listemur[i]->h = 0;
-        listemur[i]->w = 0;
-    }
-
+void init_walls(sprite_t *listemur[]){
     listemur[0]->posx = 48;
     listemur[0]->posy = 0;
     listemur[0]->h = 6*METEORITE_SIZE;
@@ -69,37 +61,31 @@ void print_sprite(sprite_t *sprite){
  * \brief La fonction initialise les données du monde du jeu
  * \param world les données du monde
  */
-void init_data(world_t * world){
-    //on n'est pas à la fin du jeu
+void init_data(world_t *world) {
+    // on n'est pas à la fin du jeu
     world->gameover = 0;
+
     world->spaceship = malloc(sizeof(sprite_t));
-    init_sprite(world->spaceship, (SCREEN_WIDTH - SHIP_SIZE)/2, SCREEN_HEIGHT - SHIP_SIZE, SHIP_SIZE,SHIP_SIZE);
-    print_sprite(world->spaceship);
+    init_sprite(world->spaceship, (SCREEN_WIDTH - SHIP_SIZE) / 2, SCREEN_HEIGHT - SHIP_SIZE, SHIP_SIZE, SHIP_SIZE);
+
     world->finishline = malloc(sizeof(sprite_t));
-    init_sprite(world->finishline, 0, FINISH_LINE_HEIGHT,SCREEN_WIDTH,FINISH_LINE_HEIGHT);
+    init_sprite(world->finishline, 0, FINISH_LINE_HEIGHT, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
+
     world->vy = INITIAL_SPEED;
     world->make_disappear = 0;
-    sprite_t **listemur = malloc(sizeof(sprite_t*) * 6);
-    init_walls(listemur);
-}
 
-
-void clean_data(world_t *world){
-    /* utile uniquement si vous avez fait de l'allocation dynamique (malloc); la fonction ici doit permettre de libérer la mémoire (free) */
-    free(world->spaceship);
-    free(world->finishline);
+    // Initialisation des murs de météorites
     for (int i = 0; i < 6; i++) {
-        free(world->listemur[i]);
+        world->listemur[i] = malloc(sizeof(sprite_t));
     }
-    free(world->listemur);
+
+    init_walls(world->listemur);
 }
 
 /**
  * \brief La fonction nettoie les données du monde
  * \param world les données du monde
  */
-
-
 void clean_data(world_t *world){
     /* utile uniquement si vous avez fait de l'allocation dynamique (malloc); la fonction ici doit permettre de libérer la mémoire (free) */
     free(world->spaceship);
@@ -107,7 +93,6 @@ void clean_data(world_t *world){
     for (int i = 0; i < 6; i++) {
         free(world->listemur[i]);
     }
-    free(world->listemur);
 }
 
 /**
@@ -164,13 +149,17 @@ int is_game_over(world_t *world){
  * \param les données du monde
  */
 
-void update_data(world_t *world){
+
+void update_data(world_t *world) {
     world->finishline->posy += world->vy;
-    for(int i = 0; i<6; i++){
+
+    for (int i = 0; i < 6; i++) {
         world->listemur[i]->posy += world->vy;
     }
+
     border_cross(world);
-    for(int i = 0; i<6; i++){
+
+    for (int i = 0; i < 6; i++) {
         handle_sprites_collision(world, world->spaceship, world->listemur[i]);
     }
 }
