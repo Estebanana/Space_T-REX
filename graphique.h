@@ -70,4 +70,10 @@ void apply_walls(SDL_Renderer *renderer, SDL_Texture *textures, sprite_t* sprite
  */
 void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *textures);
 
+void time_counter(SDL_Renderer *renderer, world_t *world, textures_t *textures);
+
+void end_game(world_t *world, SDL_Renderer *renderer, textures_t *textures);
+
+void check_closing_time(world_t *world);
+
 #endif

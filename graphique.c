@@ -58,6 +58,65 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t* sprite
 }
 
 /**
+ * \brief 
+ * \param 
+*/
+void time_counter(SDL_Renderer *renderer, world_t* world,textures_t *textures){
+    if (world->gameover == 0) {
+        // Afficher le temps écoulé en haut à gauche de l'écran
+        char time_str[20];
+        Uint32 current_time = SDL_GetTicks();
+        float elapsed_seconds = current_time / 1000.0f;
+        sprintf(time_str, "Time: %.2f s", elapsed_seconds);
+        apply_text(renderer, 10, 10, 200, 30, time_str, textures->font);
+    }
+}
+
+/**
+ * \brief 
+ * \param world les données du monde
+ * \return 
+ */
+void end_game(world_t *world, SDL_Renderer *renderer, textures_t *textures) {
+    if ((world->gameover == 1 || world->finishtime != 0) && world->closing_time == 0) {
+        world->closing_time = SDL_GetTicks();
+    }
+    
+    if (world->gameover == 1) {
+        char msg_gameover[20];
+        sprintf(msg_gameover, "You lost !");
+        apply_text(renderer, 45, 140, 210, 60, msg_gameover, textures->font);
+    }
+    
+    if (world->finishtime != 0) {
+        float elapsed_seconds = (world->finishtime) / 1000.0f;
+
+        // Afficher le message de fin avec le temps écoulé
+        char msg_finish[40];
+        sprintf(msg_finish, "You finished in %.2f s !", elapsed_seconds);
+        apply_text(renderer, 45, 140, 210, 60, msg_finish, textures->font);
+    }
+}
+
+/**
+ * \brief 
+ * \param world données du monde
+ */
+void check_closing_time(world_t *world) {
+    if (world->closing_time != 0) {
+        Uint32 current_time = SDL_GetTicks();
+        Uint32 elapsed_time = current_time - world->closing_time;
+
+        // Définir la durée souhaitée avant de fermer l'application (ici 3 secondes)
+        Uint32 closing_duration = 3000;  // 2 secondes
+        if (elapsed_time >= closing_duration) {
+            // Fermer l'application
+            exit(0);
+        }
+    }
+}
+
+/**
  * \brief La fonction rafraichit l'écran en fonction de l'état des données du monde
  * \param renderer le renderer lié à l'écran de jeu
  * \param world les données du monde
@@ -96,13 +155,12 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *texture
         apply_walls(renderer,textures->meteorite, world->listemur[i]);
     }
     
-    // Afficher le temps écoulé en haut à gauche de l'écran
-    char time_str[20];
-    Uint32 current_time = SDL_GetTicks();
-    float elapsed_seconds = current_time / 1000.0f;
-    sprintf(time_str, "Time: %.2f s", elapsed_seconds);
-    apply_text(renderer, 10, 10, 200, 30, time_str, textures->font);
-    
+    time_counter(renderer, world, textures);
+    end_game(world, renderer, textures);
+
+    //verification de la fermeture du jeu
+    check_closing_time(world);    
+
     // on met à jour l'écran
     update_screen(renderer);
 }

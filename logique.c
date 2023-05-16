@@ -64,6 +64,9 @@ void print_sprite(sprite_t *sprite){
 void init_data(world_t *world) {
     // on n'est pas à la fin du jeu
     world->quit = 0;
+    world->gameover = 0;
+    world->finishtime = 0;
+    world->closing_time = 0;
 
     world->spaceship = malloc(sizeof(sprite_t));
     init_sprite(world->spaceship, (SCREEN_WIDTH - SHIP_SIZE) / 2, SCREEN_HEIGHT - SHIP_SIZE, SHIP_SIZE, SHIP_SIZE);
@@ -143,28 +146,6 @@ int is_game_over(world_t *world){
     return world->quit;
 }
 
-/**
- * \brief 
- * \param world les données du monde
- * \return 
- */
-
-void end_game(world_t *world) {
-    static int game_over_message = 0; // Variable statique pour suivre l'affichage du message
-    
-    if (!game_over_message && world->gameover == 1) {
-        printf("You lost!\n");
-        game_over_message = 1; // Marquer le message comme déjà affiché
-    }
-    
-    if (!game_over_message && sprites_collide(world->spaceship, world->finishline)) {
-        Uint32 current_time = SDL_GetTicks();
-        float elapsed_seconds = current_time / 1000.0f;
-        
-        printf("You finished in %.2f s!\n", elapsed_seconds);
-        game_over_message = 1; // Marquer le message comme déjà affiché
-    }
-}
 
 /**
  * \brief La fonction met à jour les données des murs
@@ -189,7 +170,9 @@ void update_data(world_t *world) {
     for (int i = 0; i < 6; i++) {
         handle_sprites_collision(world, world->spaceship, world->listemur[i]);
     }
-    end_game(world);
+    if (sprites_collide(world->spaceship, world->finishline) && world->finishtime == 0) {
+        world->finishtime = SDL_GetTicks();
+    }
 }
 
 

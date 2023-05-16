@@ -38,6 +38,9 @@ struct world_s{
     int vy; /*!< Correspond à la vitesse de déplacement vertical de la ligne d'arrivée. */
     sprite_t * listemur[6]; /*!< Champ du sprite pour le tableau de murs. */
     int make_disappear; /*!< Champ visibilité du sprite. */
+    Uint32 finishtime; /*!< Champ de l'état de la ligne d'arrivée pour l'affichage du temps au bon moment. */
+    Uint32 closing_time; /*!< Champ du temps de fin du jeu. */
+
 };
 
 /**
