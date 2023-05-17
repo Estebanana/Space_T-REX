@@ -37,6 +37,7 @@ void init_textures(SDL_Renderer *renderer, textures_t *textures){
     textures->font = load_font("ressources/arial.ttf", 14);
     textures->point = Mix_LoadMUS("ressources/point.mp3");
     textures->die = Mix_LoadMUS("ressources/die.mp3");
+    textures->jump = Mix_LoadMUS("ressources/jump.mp3");
 
 }
 
@@ -67,13 +68,23 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t* sprite
  * \param 
 */
 void time_counter(SDL_Renderer *renderer, world_t* world,textures_t *textures){
+    static int x = 0;
+    if(world->finishtime != 0){
+        x = 1;
+    }
     if (world->gameover == 0) {
         // Afficher le temps écoulé en haut à gauche de l'écran
         char time_str[20];
         Uint32 current_time = SDL_GetTicks();
-        float elapsed_seconds = current_time / 1000.0f;
-        sprintf(time_str, "Time: %.2f s", elapsed_seconds);
-        apply_text(renderer, 10, 10, 200, 30, time_str, textures->font);
+        
+        if(x ==1){
+            current_time -= 3000; // on enlève le temps passé à l'arret
+        }
+        if(world->finishtime == 0){
+            float elapsed_seconds = current_time / 1000.0f;
+            sprintf(time_str, "Time: %.2f s", elapsed_seconds);
+            apply_text(renderer, 10, 10, 200, 30, time_str, textures->font);
+        }
     }
 }
 
@@ -122,7 +133,6 @@ void check_closing_time(world_t *world, textures_t *textures) {
     if (world->closing_time != 0) {
         Uint32 current_time = SDL_GetTicks();
         Uint32 elapsed_time = current_time - world->closing_time;
-        world->nb_mur = 15;
         world->vy = 0;
 
 
@@ -135,7 +145,7 @@ void check_closing_time(world_t *world, textures_t *textures) {
             // Fermer l'application
             world->finishtime = 0;
             world->vy = INITIAL_SPEED;
-            world->finishline->posy = -3000;
+            world->finishline->posy = -4050;
             world->closing_time = 0;
         }
     }
@@ -166,7 +176,8 @@ void apply_walls(SDL_Renderer *renderer, SDL_Texture *textures, sprite_t* sprite
  * \param textures les textures
  */
 void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *textures){
-    
+    int x = 0;
+
     //on vide le renderer
     clear_renderer(renderer);
     
@@ -178,6 +189,10 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *texture
     apply_sprite(renderer,textures->finishline,world->finishline);
     for(int i = 0; i< world->nb_mur; i++){
         apply_walls(renderer,textures->meteorite, world->listemur[i]);
+        if(world->spaceship->posy < world->listemur[i]->posy && world->spaceship->posy + INITIAL_SPEED > world->listemur[i]->posy && x == 0){
+            play_sound(textures->jump);
+            x = i;
+        }
     }
     
     time_counter(renderer, world, textures);

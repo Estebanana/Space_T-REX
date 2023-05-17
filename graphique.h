@@ -21,8 +21,9 @@ struct textures_s{
     SDL_Texture* finishline; /*!< Texture liée à l'image de la ligne d'arrivée. */
     SDL_Texture* meteorite; /*!< Texture liée à l'image de la météorite. */
     TTF_Font* font; /*!< Champ de la police utilisé. */
-    Mix_Music *point;
-    Mix_Music *die;
+    Mix_Music *point; /*!< Champ du son point. */
+    Mix_Music *die; /*!< Champ du son mort. */
+    Mix_Music *jump; /*!< Champ du son passage de mur. */
 };
 
 /**

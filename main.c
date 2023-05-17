@@ -11,6 +11,7 @@
 #include "constante.h"
 #include "graphique.h"
 #include "logique.h"
+#include <time.h>
 
 /**
 * \brief fonction qui nettoie le jeu: nettoyage de la partie graphique (SDL), nettoyage des textures, nettoyage des données
@@ -52,7 +53,8 @@ int main( int argc, char* args[] )
 
     //initialisation du jeu
     init(&window,&renderer,&textures,&world);
-    
+    SDL_SetWindowTitle(window, "Dino Survival !"); // on renomme la fenetre du jeu
+
     while(!is_game_over(&world)){ //tant que le jeu n'est pas fini
         
         //gestion des évènements

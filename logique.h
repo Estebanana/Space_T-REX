@@ -9,6 +9,7 @@
 #include "constante.h"
 #include "sdl2-light.h"
 #include <SDL2/SDL_mixer.h>
+#include <time.h>
 
 
 /**
@@ -37,7 +38,7 @@ struct world_s{
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
     sprite_t * finishline; /*!< Champ du sprite pour la ligne d'arrivée. */
     int vy; /*!< Correspond à la vitesse de déplacement vertical de la ligne d'arrivée. */
-    sprite_t * listemur[20]; /*!< Champ du sprite pour le tableau de murs. */
+    sprite_t * listemur[200]; /*!< Champ du sprite pour le tableau de murs. */
     int nb_mur; /*!< Champ du nombre d'élément que va contenir le tableau de murs */
     int make_noise; /*!< Champ pour activer le son du sprite. */
     Uint32 finishtime; /*!< Champ de l'état de la ligne d'arrivée pour l'affichage du temps au bon moment. */
@@ -98,5 +99,7 @@ void handle_sprites_collision(world_t* world, sprite_t *sp1, sprite_t *sp2);
 void update_walls(world_t *world);
 
 void play_sound(Mix_Music * son);
+
+void init_walls(world_t* world, sprite_t *listemur[]);
 
 #endif

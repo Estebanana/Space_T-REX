@@ -9,6 +9,8 @@
 #include "constante.h"
 #include "sdl2-light.h"
 #include <SDL2/SDL_mixer.h>
+#include <time.h>
+
 
 
 /**
@@ -22,7 +24,9 @@ void init_sprite(sprite_t * sprite, int x,int y,int w,int h){
     sprite->w = w;
 }
 
-void init_walls(sprite_t *listemur[]){
+
+void init_walls(world_t* world, sprite_t *listemur[]){
+
     listemur[0]->posx = 0;
     listemur[0]->posy = 0;
     listemur[0]->h = 6*METEORITE_SIZE;
@@ -73,30 +77,16 @@ void init_walls(sprite_t *listemur[]){
     listemur[9]->h = 3*METEORITE_SIZE;
     listemur[9]->w = 6*METEORITE_SIZE;
 
-    listemur[10]->posx = 0;
-    listemur[10]->posy = -2000;
-    listemur[10]->h = METEORITE_SIZE;
-    listemur[10]->w = 10*METEORITE_SIZE;
-
-    listemur[11]->posx = 0;
-    listemur[11]->posy = -2150;
-    listemur[11]->h = METEORITE_SIZE;
-    listemur[11]->w = 10*METEORITE_SIZE;
-
-    listemur[12]->posx = 0;
-    listemur[12]->posy = -2380;
-    listemur[12]->h = 2*METEORITE_SIZE;
-    listemur[12]->w = 10*METEORITE_SIZE;
-
-    listemur[13]->posx = 0;
-    listemur[13]->posy = -2620;
-    listemur[13]->h = 3*METEORITE_SIZE;
-    listemur[13]->w = 10*METEORITE_SIZE;
-
-    listemur[14]->posx = 0;
-    listemur[14]->posy = -2900;
-    listemur[14]->h = 4*METEORITE_SIZE;
-    listemur[14]->w = 10*METEORITE_SIZE;
+    int k,j;
+    for (int i = 10; i < world->nb_mur; i++) {
+        listemur[i] = malloc(sizeof(sprite_t));
+        do {
+        k = rand() % (SCREEN_WIDTH - SHIP_SIZE);
+        j = rand() % (SCREEN_WIDTH - SHIP_SIZE);
+        } while (abs(k - j) <= 32);
+        init_sprite(listemur[i], k, -2000 - (i - 10) * 100, METEORITE_SIZE, METEORITE_SIZE);
+        init_sprite(listemur[i], j, -2000 - (i - 10) * 100, METEORITE_SIZE, METEORITE_SIZE);
+    }
 }
 
 void print_sprite(sprite_t *sprite){
@@ -108,12 +98,14 @@ void print_sprite(sprite_t *sprite){
  * \param world les données du monde
  */
 void init_data(world_t *world) {
+    srand(time(NULL));
+
     // on n'est pas à la fin du jeu
     world->quit = 0;
     world->gameover = 0;
     world->finishtime = 0;
     world->closing_time = 0;
-    world->nb_mur = 15;
+    world->nb_mur = 50;
 
     // Initialiser SDL_mixer
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
@@ -130,11 +122,11 @@ void init_data(world_t *world) {
     world->make_noise = 0;
 
     // Initialisation des murs de météorites
-    for (int i = 0; i < world->nb_mur; i++) {
+    for (int i = 0; i < 10; i++) {
         world->listemur[i] = malloc(sizeof(sprite_t));
     }
 
-    init_walls(world->listemur);
+    init_walls(world, world->listemur);
 }
 
 
@@ -238,7 +230,6 @@ void update_data(world_t *world) {
         world->finishtime = SDL_GetTicks();
     }
 }
-
 
 
 /**
