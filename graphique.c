@@ -20,6 +20,8 @@ void clean_textures(textures_t *textures){
     clean_texture(textures->finishline);
     clean_texture(textures->meteorite);
     clean_font(textures->font);
+    Mix_FreeMusic(textures->point); // Libérer la musique chargée
+    Mix_CloseAudio(); // Fermer SDL_mixer
 }
 
 /**
@@ -28,11 +30,14 @@ void clean_textures(textures_t *textures){
  * \param textures les textures du jeu
 */
 void init_textures(SDL_Renderer *renderer, textures_t *textures){
-    textures->background = load_image( "ressources/space-background.bmp",renderer);
-    textures->spaceship = load_image( "ressources/spaceship.bmp",renderer);
+    textures->background = load_image( "ressources/background.bmp",renderer);
+    textures->spaceship = load_image( "ressources/dino.bmp",renderer);
     textures->finishline = load_image( "ressources/finish_line.bmp",renderer);
-    textures->meteorite = load_image( "ressources/meteorite.bmp",renderer);
+    textures->meteorite = load_image( "ressources/cactus.bmp",renderer);
     textures->font = load_font("ressources/arial.ttf", 14);
+    textures->point = Mix_LoadMUS("ressources/point.mp3");
+    textures->die = Mix_LoadMUS("ressources/die.mp3");
+
 }
 
 /**
@@ -78,11 +83,18 @@ void time_counter(SDL_Renderer *renderer, world_t* world,textures_t *textures){
  * \return 
  */
 void end_game(world_t *world, SDL_Renderer *renderer, textures_t *textures) {
+    static int audio_point = 0;
+    static int audio_die = 0;
+
     if ((world->gameover == 1 || world->finishtime != 0) && world->closing_time == 0) {
         world->closing_time = SDL_GetTicks();
     }
     
     if (world->gameover == 1) {
+        if(audio_die == 0){
+            play_sound(textures->die);
+            audio_die++;
+        }
         char msg_gameover[20];
         sprintf(msg_gameover, "You lost !");
         apply_text(renderer, 45, 140, 210, 60, msg_gameover, textures->font);
@@ -90,7 +102,10 @@ void end_game(world_t *world, SDL_Renderer *renderer, textures_t *textures) {
     
     if (world->finishtime != 0) {
         float elapsed_seconds = (world->finishtime) / 1000.0f;
-
+        if(audio_point == 0){
+            play_sound(textures->point);
+            audio_point++;
+        }
         // Afficher le message de fin avec le temps écoulé
         char msg_finish[40];
         sprintf(msg_finish, "You finished in %.2f s !", elapsed_seconds);
@@ -102,16 +117,26 @@ void end_game(world_t *world, SDL_Renderer *renderer, textures_t *textures) {
  * \brief 
  * \param world données du monde
  */
-void check_closing_time(world_t *world) {
+void check_closing_time(world_t *world, textures_t *textures) {
+
     if (world->closing_time != 0) {
         Uint32 current_time = SDL_GetTicks();
         Uint32 elapsed_time = current_time - world->closing_time;
+        world->nb_mur = 15;
+        world->vy = 0;
+
 
         // Définir la durée souhaitée avant de fermer l'application (ici 3 secondes)
-        Uint32 closing_duration = 3000;  // 2 secondes
+        Uint32 closing_duration = 3000;  // 3 secondes
         if (elapsed_time >= closing_duration) {
+            if(world->gameover == 1){
+                exit(0);
+            }
             // Fermer l'application
-            exit(0);
+            world->finishtime = 0;
+            world->vy = INITIAL_SPEED;
+            world->finishline->posy = -3000;
+            world->closing_time = 0;
         }
     }
 }
@@ -147,11 +172,11 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *texture
     
     //application des textures dans le renderer
     apply_background(renderer, textures->background);
-    if(world->make_disappear == 0){ //s'il n'y a pas de collision avec le mur
+    if(world->make_noise == 0){ //s'il n'y a pas de collision avec le mur
         apply_sprite(renderer,textures->spaceship,world->spaceship);
     }
     apply_sprite(renderer,textures->finishline,world->finishline);
-    for(int i = 0; i<6; i++){
+    for(int i = 0; i< world->nb_mur; i++){
         apply_walls(renderer,textures->meteorite, world->listemur[i]);
     }
     
@@ -159,7 +184,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *texture
     end_game(world, renderer, textures);
 
     //verification de la fermeture du jeu
-    check_closing_time(world);    
+    check_closing_time(world, textures);    
 
     // on met à jour l'écran
     update_screen(renderer);

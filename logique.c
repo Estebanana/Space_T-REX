@@ -8,6 +8,7 @@
 #include "logique.h"
 #include "constante.h"
 #include "sdl2-light.h"
+#include <SDL2/SDL_mixer.h>
 
 
 /**
@@ -22,12 +23,12 @@ void init_sprite(sprite_t * sprite, int x,int y,int w,int h){
 }
 
 void init_walls(sprite_t *listemur[]){
-    listemur[0]->posx = 32;
+    listemur[0]->posx = 0;
     listemur[0]->posy = 0;
     listemur[0]->h = 6*METEORITE_SIZE;
     listemur[0]->w = 3*METEORITE_SIZE;
 
-    listemur[1]->posx = 236;
+    listemur[1]->posx = 204;
     listemur[1]->posy = 0;
     listemur[1]->h = 6*METEORITE_SIZE;
     listemur[1]->w = 3*METEORITE_SIZE;
@@ -37,20 +38,65 @@ void init_walls(sprite_t *listemur[]){
     listemur[2]->h = 5*METEORITE_SIZE;
     listemur[2]->w = METEORITE_SIZE;
 
-    listemur[3]->posx = 172;
+    listemur[3]->posx = 140;
     listemur[3]->posy = -352;
     listemur[3]->h = 5*METEORITE_SIZE;
     listemur[3]->w = 7*METEORITE_SIZE;
 
-    listemur[4]->posx = 32;
+    listemur[4]->posx = 0;
     listemur[4]->posy = -672;
     listemur[4]->h = 6*METEORITE_SIZE;
     listemur[4]->w = 3*METEORITE_SIZE;
 
-    listemur[5]->posx = 236;
+    listemur[5]->posx = 204;
     listemur[5]->posy = -672;
     listemur[5]->h = 6*METEORITE_SIZE;
     listemur[5]->w = 3*METEORITE_SIZE;
+
+    listemur[6]->posx = 0;
+    listemur[6]->posy = -1000;
+    listemur[6]->h = 2*METEORITE_SIZE;
+    listemur[6]->w = 2*METEORITE_SIZE;
+
+    listemur[7]->posx = 128;
+    listemur[7]->posy = -1000;
+    listemur[7]->h = 2*METEORITE_SIZE;
+    listemur[7]->w = 7*METEORITE_SIZE;
+
+    listemur[8]->posx = 0;
+    listemur[8]->posy = -1300;
+    listemur[8]->h = 3*METEORITE_SIZE;
+    listemur[8]->w = 6*METEORITE_SIZE;
+
+    listemur[9]->posx = 108;
+    listemur[9]->posy = -1600;
+    listemur[9]->h = 3*METEORITE_SIZE;
+    listemur[9]->w = 6*METEORITE_SIZE;
+
+    listemur[10]->posx = 0;
+    listemur[10]->posy = -2000;
+    listemur[10]->h = METEORITE_SIZE;
+    listemur[10]->w = 10*METEORITE_SIZE;
+
+    listemur[11]->posx = 0;
+    listemur[11]->posy = -2150;
+    listemur[11]->h = METEORITE_SIZE;
+    listemur[11]->w = 10*METEORITE_SIZE;
+
+    listemur[12]->posx = 0;
+    listemur[12]->posy = -2380;
+    listemur[12]->h = 2*METEORITE_SIZE;
+    listemur[12]->w = 10*METEORITE_SIZE;
+
+    listemur[13]->posx = 0;
+    listemur[13]->posy = -2620;
+    listemur[13]->h = 3*METEORITE_SIZE;
+    listemur[13]->w = 10*METEORITE_SIZE;
+
+    listemur[14]->posx = 0;
+    listemur[14]->posy = -2900;
+    listemur[14]->h = 4*METEORITE_SIZE;
+    listemur[14]->w = 10*METEORITE_SIZE;
 }
 
 void print_sprite(sprite_t *sprite){
@@ -67,22 +113,40 @@ void init_data(world_t *world) {
     world->gameover = 0;
     world->finishtime = 0;
     world->closing_time = 0;
+    world->nb_mur = 15;
+
+    // Initialiser SDL_mixer
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        printf("Erreur lors de l'initialisation de SDL_mixer: %s\n", Mix_GetError());
+    }
 
     world->spaceship = malloc(sizeof(sprite_t));
-    init_sprite(world->spaceship, (SCREEN_WIDTH - SHIP_SIZE) / 2, SCREEN_HEIGHT - SHIP_SIZE, SHIP_SIZE, SHIP_SIZE);
+    init_sprite(world->spaceship, (SCREEN_WIDTH - SHIP_SIZE) / 2, 417 - SHIP_SIZE, SHIP_SIZE, SHIP_SIZE);
 
     world->finishline = malloc(sizeof(sprite_t));
-    init_sprite(world->finishline, 0, -960, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
+    init_sprite(world->finishline, 0, -1700, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
 
     world->vy = INITIAL_SPEED;
-    world->make_disappear = 0;
+    world->make_noise = 0;
 
     // Initialisation des murs de météorites
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < world->nb_mur; i++) {
         world->listemur[i] = malloc(sizeof(sprite_t));
     }
 
     init_walls(world->listemur);
+}
+
+
+void play_sound(Mix_Music *son) {
+    if (son == NULL) {
+        printf("Erreur lors du chargement du son: %s\n", Mix_GetError());
+        return;
+    }
+
+    if (Mix_PlayMusic(son, 1) == -1) {
+        printf("Erreur lors de la lecture du son: %s\n", Mix_GetError());
+    }
 }
 
 /**
@@ -93,7 +157,7 @@ void clean_data(world_t *world){
     /* utile uniquement si vous avez fait de l'allocation dynamique (malloc); la fonction ici doit permettre de libérer la mémoire (free) */
     free(world->spaceship);
     free(world->finishline);
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < world->nb_mur; i++) {
         free(world->listemur[i]);
     }
 }
@@ -131,7 +195,7 @@ int sprites_collide(sprite_t *sp1, sprite_t *sp2){
 void handle_sprites_collision(world_t* world, sprite_t *sp1, sprite_t *sp2){
     if(sprites_collide(sp1, sp2)){
         world->vy = 0;
-        world->make_disappear =1;
+        world->make_noise =1;
         world->gameover = 1;
     }
 }
@@ -152,7 +216,7 @@ int is_game_over(world_t *world){
  * \param world données du monde
  */
 void update_walls(world_t *world) {
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < world->nb_mur; i++) {
         world->listemur[i]->posy += world->vy;
     }
 }
@@ -167,7 +231,7 @@ void update_data(world_t *world) {
     
     border_cross(world);
     update_walls(world);
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < world->nb_mur; i++) {
         handle_sprites_collision(world, world->spaceship, world->listemur[i]);
     }
     if (sprites_collide(world->spaceship, world->finishline) && world->finishtime == 0) {

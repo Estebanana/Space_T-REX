@@ -1,5 +1,5 @@
 CFLAGS = -g -O3 `sdl2-config --cflags`
-LDFLAGS = `sdl2-config --libs` -lSDL2_ttf -lm
+LDFLAGS = `sdl2-config --libs` -lSDL2_ttf -lSDL2_mixer -lm
 
 INC = sdl2-light.h sdl2-ttf-light.h constante.h logique.h graphique.h
 SRC = main.c sdl2-light.c sdl2-ttf-light.c logique.c graphique.c

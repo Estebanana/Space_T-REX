@@ -10,6 +10,7 @@
 #include "constante.h"
 #include "sdl2-light.h"
 #include "sdl2-ttf-light.h"
+#include <SDL2/SDL_mixer.h>
 
 /**
  * \brief Représentation pour stocker les textures nécessaires à l'affichage graphique
@@ -20,6 +21,8 @@ struct textures_s{
     SDL_Texture* finishline; /*!< Texture liée à l'image de la ligne d'arrivée. */
     SDL_Texture* meteorite; /*!< Texture liée à l'image de la météorite. */
     TTF_Font* font; /*!< Champ de la police utilisé. */
+    Mix_Music *point;
+    Mix_Music *die;
 };
 
 /**
@@ -74,6 +77,6 @@ void time_counter(SDL_Renderer *renderer, world_t *world, textures_t *textures);
 
 void end_game(world_t *world, SDL_Renderer *renderer, textures_t *textures);
 
-void check_closing_time(world_t *world);
+void check_closing_time(world_t *world, textures_t *textures);
 
 #endif
